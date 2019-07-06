@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Printing;
 using System.Web;
+using System.Windows.Forms;
 
 using PdfiumViewer;
 
@@ -178,7 +179,6 @@ namespace windows_printer
 
                 case "application/x-javascript":
                     return PrintText(filename, printerSettings, pageSettings, copies);
-
                 default:
                     if (mimeType.Contains("image/"))
                         return PrintImage(filename, printerSettings, pageSettings, copies);
@@ -330,6 +330,19 @@ namespace windows_printer
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
+                return false;
+            }
+        }
+        private static bool PrintHtml()
+        {
+            try {
+                WebBrowser browserInstance = new WebBrowser();
+                browserInstance.DocumentCompleted += (object sender, WebBrowserDocumentCompletedEventArgs e) => browserInstance.Print();
+                browserInstance.DocumentText = System.IO.File.ReadAllText(@"C:\a.html");
+                return true;
+            }
+            catch (Exception e) {
                 Console.WriteLine(e);
                 return false;
             }
