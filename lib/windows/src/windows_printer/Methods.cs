@@ -106,7 +106,7 @@ namespace windows_printer
                 Resolutions = resolutions
             };
         }
-        public static string Print(String printer, Settings settings, String filename, short copies)
+        public static bool Print(String printer, Settings settings, String filename, short copies)
         {
             PrinterSettings printerSettings = new PrinterSettings { PrinterName = printer };
 
@@ -162,7 +162,35 @@ namespace windows_printer
             }
 
             string mimeType = MimeMapping.GetMimeMapping(filename);
-            return mimeType;
+            string[] octetStreamSupportedExtensions = { ".c++", ".cc", ".com", ".conf", ".hh", ".java", ".log" };
+
+            switch (mimeType)
+            {
+                case "application/pdf":
+                    return PrintPDF(filename, printerSettings, pageSettings, copies);
+
+                case "application/octet-stream":
+                    string extension = filename.Substring(filename.LastIndexOf("."));
+
+                    if (octetStreamSupportedExtensions.Contains(extension))
+                        return PrintText(filename, printerSettings, pageSettings, copies);
+                    else
+                        return false;
+
+                case "application/x-javascript":
+                    return PrintText(filename, printerSettings, pageSettings, copies);
+                case "text/html":
+                    return PrintHtml();
+                default:
+                    if (mimeType.Contains("image/"))
+                        return PrintImage(filename, printerSettings, pageSettings, copies);
+                    else if (mimeType.Contains("text/"))
+                        return PrintText(filename, printerSettings, pageSettings, copies);
+                    else
+                        return false;
+            }
+
+            return false;
         }
         #endregion
 
@@ -313,7 +341,7 @@ namespace windows_printer
             try {
                 WebBrowser browserInstance = new WebBrowser();
                 browserInstance.DocumentCompleted += (object sender, WebBrowserDocumentCompletedEventArgs e) => browserInstance.Print();
-                browserInstance.DocumentText = System.IO.File.ReadAllText(@"C:\a.html");
+                browserInstance.DocumentText = System.IO.File.ReadAllText(@"D:\a.html");
                 return true;
             }
             catch (Exception e) {
