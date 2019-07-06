@@ -106,7 +106,7 @@ namespace windows_printer
                 Resolutions = resolutions
             };
         }
-        public static bool Print(String printer, Settings settings, String filename, short copies)
+        public static string Print(String printer, Settings settings, String filename, short copies)
         {
             PrinterSettings printerSettings = new PrinterSettings { PrinterName = printer };
 
@@ -162,33 +162,7 @@ namespace windows_printer
             }
 
             string mimeType = MimeMapping.GetMimeMapping(filename);
-            string[] octetStreamSupportedExtensions = { ".c++", ".cc", ".com", ".conf", ".hh", ".java", ".log" };
-
-            switch (mimeType)
-            {
-                case "application/pdf":
-                    return PrintPDF(filename, printerSettings, pageSettings, copies);
-
-                case "application/octet-stream":
-                    string extension = filename.Substring(filename.LastIndexOf("."));
-
-                    if (octetStreamSupportedExtensions.Contains(extension))
-                        return PrintText(filename, printerSettings, pageSettings, copies);
-                    else
-                        return false;
-
-                case "application/x-javascript":
-                    return PrintText(filename, printerSettings, pageSettings, copies);
-                default:
-                    if (mimeType.Contains("image/"))
-                        return PrintImage(filename, printerSettings, pageSettings, copies);
-                    else if (mimeType.Contains("text/"))
-                        return PrintText(filename, printerSettings, pageSettings, copies);
-                    else
-                        return false;
-            }
-
-            return false;
+            return mimeType;
         }
         #endregion
 
