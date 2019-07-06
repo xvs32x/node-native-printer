@@ -9,6 +9,7 @@ using System.Web;
 using System.Windows.Forms;
 
 using PdfiumViewer;
+using System.Threading;
 
 namespace windows_printer
 {
@@ -339,9 +340,13 @@ namespace windows_printer
         private static bool PrintHtml()
         {
             try {
-                WebBrowser browserInstance = new WebBrowser();
-                browserInstance.DocumentCompleted += (object sender, WebBrowserDocumentCompletedEventArgs e) => browserInstance.Print();
-                browserInstance.DocumentText = System.IO.File.ReadAllText(@"D:\a.html");
+                Thread ThA = new Thread(() => {
+                    WebBrowser browserInstance = new WebBrowser();
+                    browserInstance.DocumentCompleted += (object sender, WebBrowserDocumentCompletedEventArgs e) => browserInstance.Print();
+                    browserInstance.DocumentText = System.IO.File.ReadAllText(@"D:\a.html");
+                });
+                ThA.SetApartmentState(ApartmentState.STA);
+                ThA.Start();
                 return true;
             }
             catch (Exception e) {
